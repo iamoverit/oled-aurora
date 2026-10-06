@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.1.0</Version>
+    <Authors>Ilya Filisteev</Authors>
+    <RepositoryUrl>https://github.com/iamoverit/oled-aurora</RepositoryUrl>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+</Project>

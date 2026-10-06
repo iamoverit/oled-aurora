@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/OledAurora.Core/OledAurora.Core.csproj" />
+  <Project Path="src/OledAurora/OledAurora.csproj" />
+  <Project Path="tests/OledAurora.Checks/OledAurora.Checks.csproj" />
+</Solution>
