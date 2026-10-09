@@ -9,7 +9,7 @@
   <StackPanel DockPanel.Dock="Top">
    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
     <StackPanel><TextBlock Text="OLED Aurora" FontSize="27" FontWeight="SemiBold"/><TextBlock Text="Мягкое движение поверх рабочего стола" Foreground="{StaticResource Muted}" Margin="0,3,0,0"/></StackPanel>
-    <Border Grid.Column="1" CornerRadius="6" Background="#273D3C" Padding="10,5" VerticalAlignment="Center"><TextBlock Text="FO48U · 0.1" Foreground="#B4DCD1" FontSize="12"/></Border>
+    <Border Grid.Column="1" CornerRadius="6" Background="#273D3C" Padding="10,5" VerticalAlignment="Center"><TextBlock x:Name="VersionLabel" Foreground="#B4DCD1" FontSize="12"/></Border>
    </Grid>
    <Border Background="#202631" CornerRadius="8" Margin="0,20,0,16" Height="74" ClipToBounds="True">
     <Grid><TextBlock Text="Спокойный фон. Привычный рабочий ритм." Foreground="#C5CEDB" Margin="16,0" VerticalAlignment="Center"/><local:AuroraVisual x:Name="MiniPreview"/></Grid>
@@ -36,7 +36,7 @@
      <StackPanel Grid.Column="2"><TextBlock Text="ИНТЕРВАЛ" Style="{StaticResource Label}"/><TextBlock x:Name="IntervalLabel"/><Slider x:Name="IntervalSlider" Minimum="30" Maximum="600" TickFrequency="15" ValueChanged="ValueChanged" AutomationProperties.Name="Интервал анимации"/></StackPanel>
     </Grid>
     <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
-     <StackPanel><TextBlock Text="ПАЛИТРА" Style="{StaticResource Label}"/><ComboBox x:Name="PaletteBox" SelectionChanged="PaletteChanged"><ComboBoxItem Content="Холодное сияние"/><ComboBoxItem Content="Дымчатая волна"/></ComboBox></StackPanel>
+     <StackPanel><TextBlock Text="АНИМАЦИЯ" Style="{StaticResource Label}"/><ComboBox x:Name="PaletteBox" SelectionChanged="PaletteChanged"><ComboBoxItem Content="Холодное сияние"/><ComboBoxItem Content="Дымчатая волна"/><ComboBoxItem Content="Северное сияние"/></ComboBox></StackPanel>
      <StackPanel Grid.Column="2"><TextBlock Text="ПЛАВНОСТЬ" Style="{StaticResource Label}"/><ComboBox x:Name="FpsBox"><ComboBoxItem Content="30 кадров/с"/><ComboBoxItem Content="60 кадров/с"/></ComboBox></StackPanel>
     </Grid>
     <CheckBox x:Name="EnabledBox" Content="Запускать по расписанию"/>

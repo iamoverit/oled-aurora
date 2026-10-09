@@ -56,6 +56,11 @@ Check("Coverage uses physical screen pixels", () =>
     Require(AnimationMath.CoverageHeight(2160, 20) == 432);
     Require(AnimationMath.CoverageHeight(1440, 35) == 504);
 });
+Check("Northern lights survives configuration normalization", () =>
+{
+    var settings = new AppSettings { Palette = WavePalette.NorthernLights }.Normalize();
+    Require(settings.Palette == WavePalette.NorthernLights);
+});
 Check("Settings roundtrip and corrupt-file recovery preserve the original", () =>
 {
     var directory = Path.Combine(Path.GetTempPath(), "OledAuroraChecks", Guid.NewGuid().ToString("N"));
@@ -66,6 +71,13 @@ Check("Settings roundtrip and corrupt-file recovery preserve the original", () =
         var settings = new AppSettings { Enabled = false, MonitorDeviceName = @"\\.\DISPLAY2", Palette = WavePalette.Smoke, OpacityPercent = 47 };
         store.Save(settings);
         Require(store.Load() == settings);
+        var northernLights = settings with { Palette = WavePalette.NorthernLights };
+        store.Save(northernLights);
+        Require(store.Load() == northernLights);
+        File.WriteAllText(store.FilePath, "{\"Palette\":\"Aurora\",\"CoveragePercent\":35,\"OpacityPercent\":47}");
+        Require(store.Load().Palette == WavePalette.Aurora && store.Load().CoveragePercent == 35 && store.Load().OpacityPercent == 47);
+        File.WriteAllText(store.FilePath, "{\"Palette\":\"Smoke\",\"IntervalSeconds\":300}");
+        Require(store.Load().Palette == WavePalette.Smoke && store.Load().IntervalSeconds == 300);
         Require(!File.Exists(store.FilePath + ".tmp"));
         File.WriteAllText(store.FilePath, "{ corrupt");
         Require(store.Load() == new AppSettings() && store.LoadWarning != null);

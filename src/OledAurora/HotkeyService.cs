@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace OledAurora;
@@ -12,13 +13,13 @@ internal sealed class HotkeyService : IDisposable
     private readonly List<int> _registered = [];
     internal string Warning { get; private set; } = "";
 
-    internal HotkeyService(Action play, Action pause)
+    internal HotkeyService(Action play, Action pause, uint playKey = 0x79, uint pauseKey = 0x7A)
     {
         _play = play; _pause = pause;
         _source = new HwndSource(new HwndSourceParameters("OLED Aurora hotkeys") { ParentWindow = new IntPtr(-3) });
         _source.AddHook(Hook);
-        Register(1, 0x79, "Ctrl + Alt + F10");
-        Register(2, 0x7A, "Ctrl + Alt + F11");
+        Register(1, playKey, $"Ctrl + Alt + {KeyInterop.KeyFromVirtualKey((int)playKey)}");
+        Register(2, pauseKey, $"Ctrl + Alt + {KeyInterop.KeyFromVirtualKey((int)pauseKey)}");
     }
 
     private void Register(int id, uint key, string label)

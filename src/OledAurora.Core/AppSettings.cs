@@ -2,7 +2,8 @@ using System;
 
 namespace OledAurora.Core;
 
-public enum WavePalette { Aurora, Smoke }
+// Keep existing values/names so saved 0.1 settings retain their selected effect.
+public enum WavePalette { Aurora = 0, Smoke = 1, NorthernLights = 2 }
 
 public sealed record AppSettings
 {

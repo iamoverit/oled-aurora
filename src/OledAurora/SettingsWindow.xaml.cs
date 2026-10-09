@@ -17,6 +17,8 @@ public partial class SettingsWindow : Window
     {
         _app = app;
         InitializeComponent();
+        var version = typeof(App).Assembly.GetName().Version!;
+        VersionLabel.Text = $"FO48U · {version.Major}.{version.Minor}.{version.Build}";
         Height = Math.Min(860, SystemParameters.WorkArea.Height - 48);
         LoadSettings(app.Settings);
         app.StatusChanged += RefreshStatus;
@@ -61,7 +63,7 @@ public partial class SettingsWindow : Window
         DurationSeconds = DurationSlider.Value,
         IntervalSeconds = (int)IntervalSlider.Value,
         FramesPerSecond = FpsBox.SelectedIndex == 1 ? 60 : 30,
-        Palette = PaletteBox.SelectedIndex == 1 ? WavePalette.Smoke : WavePalette.Aurora,
+        Palette = SelectedPalette,
         PauseOnFullscreen = FullscreenBox.IsChecked == true,
         StartWithWindows = StartupBox.IsChecked == true
     }.Normalize();
@@ -73,8 +75,11 @@ public partial class SettingsWindow : Window
         OpacityLabel.Text = $"{OpacitySlider.Value:0}%";
         DurationLabel.Text = $"{DurationSlider.Value:0} секунд";
         IntervalLabel.Text = $"{IntervalSlider.Value / 60:0.##} мин · {IntervalSlider.Value:0} с";
-        MiniPreview.SetFrame(2.4, OpacitySlider.Value / 100, PaletteBox.SelectedIndex == 1 ? WavePalette.Smoke : WavePalette.Aurora);
+        MiniPreview.SetFrame(2.4, OpacitySlider.Value / 100, SelectedPalette);
     }
+
+    private WavePalette SelectedPalette => PaletteBox.SelectedIndex >= 0
+        && Enum.IsDefined((WavePalette)PaletteBox.SelectedIndex) ? (WavePalette)PaletteBox.SelectedIndex : WavePalette.Aurora;
 
     private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UpdatePreview();
     private void PaletteChanged(object sender, SelectionChangedEventArgs e) => UpdatePreview();

@@ -48,7 +48,15 @@ internal static class SmokeTest
             Check(rect.Bottom - rect.Top == AnimationMath.CoverageHeight(screen.Bounds.Height, 35), "Replay and changed coverage");
             overlay.Stop();
             Check(!overlay.IsPlaying, "Explicit stop");
-            using (var hotkeys = new HotkeyService(() => { }, () => { }))
+            overlay.Play(settings with { CoveragePercent = 5, Palette = WavePalette.NorthernLights }, screen);
+            await Task.Delay(150);
+            NativeMethods.GetWindowRect(overlay.Handle, out rect);
+            Check(overlay.RenderedFrames > 0 && rect.Bottom - rect.Top == AnimationMath.CoverageHeight(screen.Bounds.Height, 5),
+                "Northern lights plays at minimum coverage");
+            overlay.Stop();
+            // Exercise the same registration path with F13/F14 while a user's older
+            // copy may legitimately own the application's F10/F11 bindings.
+            using (var hotkeys = new HotkeyService(() => { }, () => { }, 0x7C, 0x7D))
             {
                 Check(hotkeys.Warning.Length == 0, "Global hotkeys registered and released");
             }
@@ -62,6 +70,11 @@ internal static class SmokeTest
             slider.Value = 35;
             Check(((TextBlock)window.FindName("CoverageLabel")).Text == "35%", "Settings controls update their displayed values");
             slider.Value = 20;
+            var paletteBox = (ComboBox)window.FindName("PaletteBox");
+            paletteBox.SelectedIndex = 2;
+            Check(((ComboBoxItem)paletteBox.SelectedItem).Content as string == "Северное сияние", "Northern lights can be selected in settings");
+            Check(((TextBlock)window.FindName("VersionLabel")).Text.EndsWith(typeof(App).Assembly.GetName().Version!.ToString(3), StringComparison.Ordinal),
+                "Settings show the released version");
             var content = (FrameworkElement)window.Content;
             content.Measure(new Size(640, 820));
             content.Arrange(new Rect(0, 0, 640, 820));

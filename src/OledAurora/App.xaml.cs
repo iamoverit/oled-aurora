@@ -36,6 +36,13 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (e.Args.Contains("--visual-test"))
+        {
+            int index = Array.IndexOf(e.Args, "--visual-test");
+            var report = index + 1 < e.Args.Length ? e.Args[index + 1] : Path.Combine(Path.GetTempPath(), "oled-aurora-visual.json");
+            Dispatcher.InvokeAsync(() => Shutdown(VisualChecks.Run(report)));
+            return;
+        }
         if (e.Args.Contains("--smoke-test"))
         {
             int index = Array.IndexOf(e.Args, "--smoke-test");
