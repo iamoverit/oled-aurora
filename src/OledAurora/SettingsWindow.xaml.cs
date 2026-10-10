@@ -46,6 +46,7 @@ public partial class SettingsWindow : Window
         DurationSlider.Value = settings.DurationSeconds;
         IntervalSlider.Value = settings.IntervalSeconds;
         PaletteBox.SelectedIndex = (int)settings.Palette;
+        RendererBox.SelectedIndex = (int)settings.NorthernLightsRenderer;
         FpsBox.SelectedIndex = settings.FramesPerSecond == 60 ? 1 : 0;
         EnabledBox.IsChecked = settings.Enabled;
         FullscreenBox.IsChecked = settings.PauseOnFullscreen;
@@ -64,6 +65,7 @@ public partial class SettingsWindow : Window
         IntervalSeconds = (int)IntervalSlider.Value,
         FramesPerSecond = FpsBox.SelectedIndex == 1 ? 60 : 30,
         Palette = SelectedPalette,
+        NorthernLightsRenderer = SelectedRenderer,
         PauseOnFullscreen = FullscreenBox.IsChecked == true,
         StartWithWindows = StartupBox.IsChecked == true
     }.Normalize();
@@ -75,11 +77,19 @@ public partial class SettingsWindow : Window
         OpacityLabel.Text = $"{OpacitySlider.Value:0}%";
         DurationLabel.Text = $"{DurationSlider.Value:0} секунд";
         IntervalLabel.Text = $"{IntervalSlider.Value / 60:0.##} мин · {IntervalSlider.Value:0} с";
-        MiniPreview.SetFrame(2.4, OpacitySlider.Value / 100, SelectedPalette);
+        RendererPanel.Visibility = SelectedPalette == WavePalette.NorthernLights ? Visibility.Visible : Visibility.Collapsed;
+        RendererHint.Text = SelectedRenderer == NorthernLightsRenderer.Classic
+            ? "Мягкие градиентные занавесы — прежний вариант сияния."
+            : NorthernLightsEffect.IsSupported
+                ? "Процедурные световые ленты, тонкие лучи и переливы цвета."
+                : "GPU-шейдер недоступен в текущем сеансе. Используется классическое сияние.";
+        MiniPreview.SetFrame(2.4, OpacitySlider.Value / 100, SelectedPalette, SelectedRenderer);
     }
 
     private WavePalette SelectedPalette => PaletteBox.SelectedIndex >= 0
         && Enum.IsDefined((WavePalette)PaletteBox.SelectedIndex) ? (WavePalette)PaletteBox.SelectedIndex : WavePalette.Aurora;
+    private NorthernLightsRenderer SelectedRenderer => RendererBox.SelectedIndex == 1
+        ? NorthernLightsRenderer.Shader : NorthernLightsRenderer.Classic;
 
     private void ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UpdatePreview();
     private void PaletteChanged(object sender, SelectionChangedEventArgs e) => UpdatePreview();

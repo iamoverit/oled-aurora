@@ -39,6 +39,11 @@
      <StackPanel><TextBlock Text="АНИМАЦИЯ" Style="{StaticResource Label}"/><ComboBox x:Name="PaletteBox" SelectionChanged="PaletteChanged"><ComboBoxItem Content="Холодное сияние"/><ComboBoxItem Content="Дымчатая волна"/><ComboBoxItem Content="Северное сияние"/></ComboBox></StackPanel>
      <StackPanel Grid.Column="2"><TextBlock Text="ПЛАВНОСТЬ" Style="{StaticResource Label}"/><ComboBox x:Name="FpsBox"><ComboBoxItem Content="30 кадров/с"/><ComboBoxItem Content="60 кадров/с"/></ComboBox></StackPanel>
     </Grid>
+    <StackPanel x:Name="RendererPanel" Visibility="Collapsed">
+     <TextBlock Text="ОТРИСОВКА СЕВЕРНОГО СИЯНИЯ" Style="{StaticResource Label}"/>
+     <ComboBox x:Name="RendererBox" SelectionChanged="PaletteChanged" AutomationProperties.Name="Отрисовка северного сияния"><ComboBoxItem Content="Классическая"/><ComboBoxItem Content="Шейдерная (GPU)"/></ComboBox>
+     <TextBlock x:Name="RendererHint" Foreground="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"/>
+    </StackPanel>
     <CheckBox x:Name="EnabledBox" Content="Запускать по расписанию"/>
     <CheckBox x:Name="FullscreenBox" Content="Пауза в полноэкранных приложениях"/>
     <CheckBox x:Name="StartupBox" Content="Запускать при входе в Windows"/>

@@ -47,6 +47,15 @@ internal static class SmokeTest
             NativeMethods.GetWindowRect(overlay.Handle, out rect);
             Check(rect.Bottom - rect.Top == AnimationMath.CoverageHeight(screen.Bounds.Height, 35), "Replay and changed coverage");
             overlay.Stop();
+            overlay.Play(settings with { Palette = WavePalette.NorthernLights, NorthernLightsRenderer = NorthernLightsRenderer.Shader }, screen);
+            await Task.Delay(250);
+            Check(overlay.RenderedFrames > 0 && overlay.IsUsingShader == NorthernLightsEffect.IsSupported,
+                "Shader selection uses GPU when supported and classic fallback otherwise");
+            overlay.Stop();
+            overlay.Play(settings with { Palette = WavePalette.NorthernLights }, screen);
+            await Task.Delay(150);
+            Check(!overlay.IsUsingShader && overlay.RenderedFrames > 0, "Switching back to classic northern lights works");
+            overlay.Stop();
             Check(!overlay.IsPlaying, "Explicit stop");
             overlay.Play(settings with { CoveragePercent = 5, Palette = WavePalette.NorthernLights }, screen);
             await Task.Delay(150);
@@ -73,6 +82,15 @@ internal static class SmokeTest
             var paletteBox = (ComboBox)window.FindName("PaletteBox");
             paletteBox.SelectedIndex = 2;
             Check(((ComboBoxItem)paletteBox.SelectedItem).Content as string == "Северное сияние", "Northern lights can be selected in settings");
+            var rendererBox = (ComboBox)window.FindName("RendererBox");
+            rendererBox.SelectedIndex = 1;
+            Check(((FrameworkElement)window.FindName("RendererPanel")).Visibility == Visibility.Visible,
+                "Northern lights renderer selector is visible for northern lights");
+            paletteBox.SelectedIndex = 0;
+            Check(((FrameworkElement)window.FindName("RendererPanel")).Visibility == Visibility.Collapsed && rendererBox.SelectedIndex == 1,
+                "Other effects hide the renderer selector and preserve its selection");
+            paletteBox.SelectedIndex = 2;
+            rendererBox.SelectedIndex = 0; // software screenshot cannot execute PS 3.0
             Check(((TextBlock)window.FindName("VersionLabel")).Text.EndsWith(typeof(App).Assembly.GetName().Version!.ToString(3), StringComparison.Ordinal),
                 "Settings show the released version");
             var content = (FrameworkElement)window.Content;

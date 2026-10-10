@@ -40,9 +40,11 @@ Check("Invalid intervals are rejected", () =>
 Check("Configuration clamps hostile and non-finite values", () =>
 {
     var settings = new AppSettings { CoveragePercent = double.NaN, OpacityPercent = double.PositiveInfinity,
-        DurationSeconds = -10, IntervalSeconds = int.MinValue, FramesPerSecond = 999, Palette = (WavePalette)100 }.Normalize();
+        DurationSeconds = -10, IntervalSeconds = int.MinValue, FramesPerSecond = 999, Palette = (WavePalette)100,
+        NorthernLightsRenderer = (NorthernLightsRenderer)100 }.Normalize();
     Require(settings.CoveragePercent == 20 && settings.OpacityPercent == 25 && settings.DurationSeconds == 2);
     Require(settings.IntervalSeconds == 30 && settings.FramesPerSecond == 30 && settings.Palette == WavePalette.Aurora);
+    Require(settings.NorthernLightsRenderer == NorthernLightsRenderer.Classic);
 });
 Check("Envelope has no flash at either boundary", () =>
 {
@@ -71,9 +73,11 @@ Check("Settings roundtrip and corrupt-file recovery preserve the original", () =
         var settings = new AppSettings { Enabled = false, MonitorDeviceName = @"\\.\DISPLAY2", Palette = WavePalette.Smoke, OpacityPercent = 47 };
         store.Save(settings);
         Require(store.Load() == settings);
-        var northernLights = settings with { Palette = WavePalette.NorthernLights };
+        var northernLights = settings with { Palette = WavePalette.NorthernLights, NorthernLightsRenderer = NorthernLightsRenderer.Shader };
         store.Save(northernLights);
         Require(store.Load() == northernLights);
+        File.WriteAllText(store.FilePath, "{\"Palette\":\"NorthernLights\",\"CoveragePercent\":35,\"OpacityPercent\":47}");
+        Require(store.Load().Palette == WavePalette.NorthernLights && store.Load().NorthernLightsRenderer == NorthernLightsRenderer.Classic);
         File.WriteAllText(store.FilePath, "{\"Palette\":\"Aurora\",\"CoveragePercent\":35,\"OpacityPercent\":47}");
         Require(store.Load().Palette == WavePalette.Aurora && store.Load().CoveragePercent == 35 && store.Load().OpacityPercent == 47);
         File.WriteAllText(store.FilePath, "{\"Palette\":\"Smoke\",\"IntervalSeconds\":300}");

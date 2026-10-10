@@ -19,6 +19,7 @@ internal sealed class OverlayWindow : Window
     internal bool IsPlaying { get; private set; }
     internal int RenderedFrames { get; private set; }
     internal IntPtr Handle { get; private set; }
+    internal bool IsUsingShader => _visual.IsUsingShader;
 
     internal OverlayWindow()
     {
@@ -52,7 +53,7 @@ internal sealed class OverlayWindow : Window
     {
         Stop();
         _settings = settings.Normalize();
-        _visual.SetFrame(0, 0, _settings.Palette);
+        _visual.SetFrame(0, 0, _settings.Palette, _settings.NorthernLightsRenderer);
         Show();
         var bounds = screen.Bounds;
         // Native coordinates are physical pixels, including negative monitor origins.
@@ -76,7 +77,8 @@ internal sealed class OverlayWindow : Window
         if (seconds >= _settings.DurationSeconds) { Stop(); return; }
         if (seconds - _lastFrame < 1.0 / _settings.FramesPerSecond) return;
         _lastFrame = seconds;
-        _visual.SetFrame(seconds, _settings.OpacityPercent / 100 * AnimationMath.Envelope(seconds, _settings.DurationSeconds), _settings.Palette);
+        _visual.SetFrame(seconds, _settings.OpacityPercent / 100 * AnimationMath.Envelope(seconds, _settings.DurationSeconds),
+            _settings.Palette, _settings.NorthernLightsRenderer);
         RenderedFrames++;
     }
 
@@ -85,7 +87,7 @@ internal sealed class OverlayWindow : Window
         CompositionTarget.Rendering -= RenderFrame;
         IsPlaying = false;
         _watch.Stop();
-        _visual.SetFrame(0, 0, _settings.Palette);
+        _visual.SetFrame(0, 0, _settings.Palette, _settings.NorthernLightsRenderer);
         if (IsVisible) Hide();
     }
 

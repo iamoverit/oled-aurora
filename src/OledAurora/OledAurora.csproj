@@ -15,5 +15,11 @@
   <ItemGroup>
     <ProjectReference Include="../OledAurora.Core/OledAurora.Core.csproj" />
     <Resource Include="Assets/aurora.ico" />
+    <Resource Include="$(IntermediateOutputPath)Shaders/NorthernLights.ps" Link="Shaders/NorthernLights.ps" />
   </ItemGroup>
+  <Target Name="CompileNorthernLightsShader" BeforeTargets="FileClassification"
+          Inputs="Shaders/NorthernLights.hlsl;../../scripts/Compile-Shaders.ps1"
+          Outputs="$(IntermediateOutputPath)Shaders/NorthernLights.ps">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/../../scripts/Compile-Shaders.ps1&quot; -OutputPath &quot;$(MSBuildProjectDirectory)/$(IntermediateOutputPath)Shaders/NorthernLights.ps&quot;" />
+  </Target>
 </Project>

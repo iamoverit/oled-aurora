@@ -1,11 +1,13 @@
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using OledAurora.Core;
 
 namespace OledAurora;
 
-public sealed class AuroraVisual : FrameworkElement
+public sealed class AuroraVisual : Grid
 {
     private static readonly Brush[] AuroraBrushes = [Cloud(119, 177, 179), Cloud(167, 149, 194), Cloud(124, 160, 185), Cloud(162, 186, 182)];
     private static readonly Brush[] SmokeBrushes = [Cloud(153, 160, 170), Cloud(117, 126, 140), Cloud(169, 176, 186), Cloud(129, 139, 149)];
@@ -13,16 +15,21 @@ public sealed class AuroraVisual : FrameworkElement
     private static readonly Brush[] RibbonBrushes = [Solid(110, 232, 166), Solid(91, 211, 201), Solid(172, 144, 218)];
     private double _time = 2.4;
     private WavePalette _palette;
+    private readonly Rectangle _shaderSurface = new() { Fill = Brushes.White, Visibility = Visibility.Collapsed };
+    private NorthernLightsEffect? _shader;
+    internal bool IsUsingShader => _shaderSurface.Visibility == Visibility.Visible;
 
     public AuroraVisual()
     {
         IsHitTestVisible = false;
         ClipToBounds = true;
+        Children.Add(_shaderSurface);
     }
 
     protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
     {
         base.OnRenderSizeChanged(sizeInfo);
+        if (_shader is not null) _shader.AspectRatio = ActualWidth / Math.Max(1, ActualHeight);
         if (ActualHeight <= 0) return;
         // RelativeToBoundingBox would include the overflowing cloud geometry, so its
         // transparent stop could land below the window and be cut off. Anchor the mask
@@ -47,11 +54,23 @@ public sealed class AuroraVisual : FrameworkElement
         OpacityMask = feather;
     }
 
-    public void SetFrame(double seconds, double opacity, WavePalette palette)
+    public void SetFrame(double seconds, double opacity, WavePalette palette,
+        NorthernLightsRenderer renderer = NorthernLightsRenderer.Classic)
     {
         _time = seconds;
         _palette = palette;
         Opacity = Math.Clamp(opacity, 0, 1);
+        bool useShader = palette == WavePalette.NorthernLights && renderer == NorthernLightsRenderer.Shader
+            && NorthernLightsEffect.IsSupported;
+        if (useShader)
+        {
+            _shader ??= new NorthernLightsEffect();
+            _shader.Time = seconds;
+            _shader.AspectRatio = ActualWidth / Math.Max(1, ActualHeight);
+            _shaderSurface.Effect = _shader;
+        }
+        else _shaderSurface.Effect = null;
+        _shaderSurface.Visibility = useShader ? Visibility.Visible : Visibility.Collapsed;
         InvalidateVisual();
     }
 
@@ -60,6 +79,7 @@ public sealed class AuroraVisual : FrameworkElement
         base.OnRender(dc);
         double width = ActualWidth, height = ActualHeight;
         if (width <= 0 || height <= 0) return;
+        if (IsUsingShader) return;
         if (_palette == WavePalette.NorthernLights)
         {
             DrawNorthernLights(dc, width, height);
